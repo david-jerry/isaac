@@ -7,7 +7,10 @@ import { Placeholder } from "@/components/ui/placeholder"
 /** Project tile used on the landing, About, and Projects pages. */
 export function ProjectCard({ project }: { project: CaseStudy }) {
   return (
-    <Link href={`/projects/${project.slug}`} className="group block">
+    <Link
+      href={`/projects/${encodeURIComponent(project.slug)}`}
+      className="group block"
+    >
       <div className="relative aspect-[4/5] w-full overflow-hidden rounded-lg bg-muted">
         {project.heroImage ? (
           <Image

@@ -14,7 +14,7 @@ function NavLink({
   const isNext = direction === "next"
   return (
     <Link
-      href={`/projects/${project.slug}`}
+      href={`/projects/${encodeURIComponent(project.slug)}`}
       className={cn(
         "group flex flex-col gap-2",
         isNext ? "items-end text-right" : "items-start",

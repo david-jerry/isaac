@@ -20,6 +20,24 @@ function parseFrontmatter(raw: string): Record<string, unknown> {
   return data && typeof data === "object" ? (data as Record<string, unknown>) : {}
 }
 
+// --- Trust-boundary sanitizers ----------------------------------------------
+// Frontmatter + filenames are treated as untrusted input: validate anything that
+// reaches an href/src so a value can never become a `javascript:`/`data:` URL.
+
+/** A local `/public` path, or undefined. */
+function safeLocalPath(value: unknown): string | undefined {
+  return typeof value === "string" && /^\/[\w\-./]*$/.test(value)
+    ? value
+    : undefined
+}
+
+/** An http(s) URL, or undefined. */
+function safeHttpUrl(value: unknown): string | undefined {
+  return typeof value === "string" && /^https?:\/\/[^\s"'<>]+$/.test(value)
+    ? value
+    : undefined
+}
+
 export interface CaseStudySection {
   /** Small left-column label, e.g. "Discovery" or "Strategy /". */
   kicker?: string
@@ -82,12 +100,26 @@ export interface CaseStudy {
 export function getAllCaseStudies(): CaseStudy[] {
   const files = fs.readdirSync(DIR).filter((f) => f.endsWith(".md"))
   return files
-    .map((file) => {
+    .map((file): CaseStudy | null => {
       const slug = file.replace(/\.md$/, "")
+      // Slugs come from filenames — allow only safe URL-path characters.
+      if (!/^[a-z0-9-]+$/.test(slug)) return null
+
       const raw = fs.readFileSync(path.join(DIR, file), "utf8")
-      const data = parseFrontmatter(raw)
-      return { slug, ...(data as Omit<CaseStudy, "slug">) }
+      const data = parseFrontmatter(raw) as Omit<CaseStudy, "slug">
+
+      // Re-validate every value that lands in an href/src.
+      return {
+        ...data,
+        slug,
+        heroImage: safeLocalPath(data.heroImage),
+        url: safeHttpUrl(data.url),
+        closing: data.closing
+          ? { ...data.closing, url: safeHttpUrl(data.closing.url) }
+          : undefined,
+      }
     })
+    .filter((project): project is CaseStudy => project !== null)
     .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
 }
 
