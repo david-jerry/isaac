@@ -11,6 +11,7 @@ import { load } from "js-yaml"
  */
 
 const DIR = path.join(process.cwd(), "content", "projects")
+const SLUG_RE = /^[a-z0-9-]+$/
 
 /** Parse the leading `---` YAML frontmatter block; ignores the markdown body. */
 function parseFrontmatter(raw: string): Record<string, unknown> {
@@ -102,9 +103,7 @@ export function getAllCaseStudies(): CaseStudy[] {
   return files
     .map((file): CaseStudy | null => {
       const slug = file.replace(/\.md$/, "")
-      // Slugs come from filenames — allow only safe URL-path characters.
-      if (!/^[a-z0-9-]+$/.test(slug)) return null
-
+      if (!SLUG_RE.test(slug)) return null
       const raw = fs.readFileSync(path.join(DIR, file), "utf8")
       const data = parseFrontmatter(raw) as Omit<CaseStudy, "slug">
 
