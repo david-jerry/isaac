@@ -11,6 +11,7 @@ import matter from "gray-matter"
  */
 
 const DIR = path.join(process.cwd(), "content", "projects")
+const SLUG_RE = /^[a-z0-9-]+$/
 
 export interface CaseStudySection {
   /** Small left-column label, e.g. "Discovery" or "Strategy /". */
@@ -76,10 +77,12 @@ export function getAllCaseStudies(): CaseStudy[] {
   return files
     .map((file) => {
       const slug = file.replace(/\.md$/, "")
+      if (!SLUG_RE.test(slug)) return null
       const raw = fs.readFileSync(path.join(DIR, file), "utf8")
       const { data } = matter(raw)
       return { slug, ...(data as Omit<CaseStudy, "slug">) }
     })
+    .filter((project): project is CaseStudy => project !== null)
     .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
 }
 
