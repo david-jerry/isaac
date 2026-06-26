@@ -1,7 +1,7 @@
 import fs from "node:fs"
 import path from "node:path"
 
-import matter from "gray-matter"
+import { load } from "js-yaml"
 
 /**
  * Markdown-backed project store. Each project is one file in `content/projects/`
@@ -11,6 +11,14 @@ import matter from "gray-matter"
  */
 
 const DIR = path.join(process.cwd(), "content", "projects")
+
+/** Parse the leading `---` YAML frontmatter block; ignores the markdown body. */
+function parseFrontmatter(raw: string): Record<string, unknown> {
+  const match = /^---\s*\n([\s\S]*?)\n---/.exec(raw)
+  if (!match) return {}
+  const data = load(match[1])
+  return data && typeof data === "object" ? (data as Record<string, unknown>) : {}
+}
 
 export interface CaseStudySection {
   /** Small left-column label, e.g. "Discovery" or "Strategy /". */
@@ -77,7 +85,7 @@ export function getAllCaseStudies(): CaseStudy[] {
     .map((file) => {
       const slug = file.replace(/\.md$/, "")
       const raw = fs.readFileSync(path.join(DIR, file), "utf8")
-      const { data } = matter(raw)
+      const data = parseFrontmatter(raw)
       return { slug, ...(data as Omit<CaseStudy, "slug">) }
     })
     .sort((a, b) => (a.order ?? 99) - (b.order ?? 99))
