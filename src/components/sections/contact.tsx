@@ -2,10 +2,12 @@
 
 import { useRef } from "react"
 import { motion, useReducedMotion, type Variants } from "motion/react"
+import { Phone } from "lucide-react"
 
 import { profile } from "@/data/profile"
 import { gsap, useGSAP } from "@/lib/gsap"
 import { cn } from "@/lib/utils"
+import { Button } from "@/components/ui/button"
 
 const reasons = [
   "Open to work!",
@@ -42,21 +44,20 @@ export function Contact() {
       )
       if (!chars.length) return
 
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        gsap.set(chars, { opacity: 1, yPercent: 0 })
-        return
-      }
+      // Under reduced motion, keep the staggered fade but drop the vertical
+      // travel + overshoot so the email still animates in without movement.
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
 
       gsap
         .timeline({ delay: 0.6 })
         .fromTo(
           chars,
-          { opacity: 0, yPercent: 90 },
+          { opacity: 0, yPercent: reduce ? 0 : 90 },
           {
             opacity: 1,
             yPercent: 0,
             duration: 0.5,
-            ease: "back.out(2)",
+            ease: reduce ? "power1.out" : "back.out(2)",
             stagger: 0.03,
           },
         )
@@ -66,6 +67,7 @@ export function Contact() {
 
   const chars = [...profile.email]
   const dotIndex = profile.email.lastIndexOf(".")
+  const whatsappLink = `https://wa.me/${profile.whatsapp.replace(/\D/g, "")}`
 
   return (
     <motion.section
@@ -103,7 +105,7 @@ export function Contact() {
       <a
         href={`mailto:${profile.email}`}
         aria-label={`Email ${profile.email}`}
-        className="block text-center text-[clamp(1.5rem,7vw,4.5rem)] font-medium tracking-tight transition-colors hover:text-brand"
+        className="email-attention block text-center text-[clamp(1.5rem,6vw,4.5rem)] font-medium tracking-tight transition-colors hover:text-brand"
       >
         <span className="sr-only">{profile.email}</span>
         <span
@@ -121,6 +123,15 @@ export function Contact() {
           ))}
         </span>
       </a>
+
+      <motion.div variants={item} className="flex justify-center">
+        <Button asChild size="lg" variant="outline">
+          <a href={whatsappLink} target="_blank" rel="noreferrer">
+            <Phone className="size-4" />
+            Call on WhatsApp
+          </a>
+        </Button>
+      </motion.div>
     </motion.section>
   )
 }

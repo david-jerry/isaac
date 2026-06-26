@@ -172,6 +172,30 @@
   }
 }
 
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Soft brand glow that breathes to draw attention to the contact email. */
+@keyframes email-pulse {
+  0%,
+  100% {
+    text-shadow: none;
+  }
+  50% {
+    text-shadow: 0 0 28px color-mix(in oklch, var(--brand) 50%, transparent);
+  }
+}
+
+.email-attention {
+  animation: email-pulse 3s ease-in-out infinite;
+}
+
 /* Ambient background shapes — each drifts in its own direction via CSS vars. */
 @keyframes float-shape {
   0% {
@@ -186,6 +210,8 @@
   }
 }
 
+/* Ambient drift is very low-contrast; it keeps moving even under reduced motion
+   (incl. mobile low-power mode), just slower, rather than freezing entirely. */
 .floating-shape {
   animation-name: float-shape;
   animation-timing-function: ease-in-out;
@@ -195,6 +221,6 @@
 
 @media (prefers-reduced-motion: reduce) {
   .floating-shape {
-    animation: none;
+    animation-duration: 60s;
   }
 }

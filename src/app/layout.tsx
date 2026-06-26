@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { FloatingShapes } from "@/components/layout/floating-shapes";
+import { GameLauncher } from "@/components/layout/game-launcher";
 import { PageTransition } from "@/components/layout/page-transition";
 import { ScrollProgress } from "@/components/layout/scroll-progress";
 import { Toaster } from "@/components/ui/sonner";
@@ -64,6 +65,7 @@ export default function RootLayout({
               <PageTransition>{children}</PageTransition>
             </main>
             <Footer />
+            <GameLauncher />
             <ScrollProgress />
             <Toaster />
           </QueryProvider>

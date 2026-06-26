@@ -41,10 +41,6 @@ export function Hero() {
       if (!el) return
 
       const phrases = profile.heroPhrases
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        el.textContent = phrases[0] ?? ""
-        return
-      }
 
       const render = (phrase: string, count: number) => {
         el.textContent = phrase.slice(0, Math.round(count))

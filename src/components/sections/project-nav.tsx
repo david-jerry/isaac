@@ -20,19 +20,21 @@ function NavLink({
         isNext ? "items-end text-right" : "items-start",
       )}
     >
-      <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground transition-colors group-hover:text-brand">
+      <span className="inline-flex items-center gap-1.5 text-xs uppercase tracking-widest text-muted-foreground transition-colors group-hover:text-brand group-active:text-brand">
         {!isNext ? (
-          <ArrowLeft className="size-3.5 transition-transform duration-300 group-hover:-translate-x-1 motion-reduce:transition-none" />
+          <ArrowLeft className="size-3.5 transition-transform duration-300 group-hover:-translate-x-1 group-active:-translate-x-1 motion-reduce:transition-none" />
         ) : null}
         {isNext ? "Next Project" : "Previous Project"}
         {isNext ? (
-          <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none" />
+          <ArrowRight className="size-3.5 transition-transform duration-300 group-hover:translate-x-1 group-active:translate-x-1 motion-reduce:transition-none" />
         ) : null}
       </span>
       <span
         className={cn(
-          "text-4xl font-semibold uppercase tracking-tight transition-[color,transform] duration-300 group-hover:text-brand sm:text-6xl motion-reduce:transition-none motion-reduce:group-hover:translate-x-0",
-          isNext ? "group-hover:-translate-x-2" : "group-hover:translate-x-2",
+          "text-4xl font-semibold uppercase tracking-tight transition-[color,transform] duration-300 group-hover:text-brand group-active:text-brand sm:text-6xl motion-reduce:transition-none motion-reduce:group-hover:translate-x-0",
+          isNext
+            ? "group-hover:-translate-x-2 group-active:-translate-x-2"
+            : "group-hover:translate-x-2 group-active:translate-x-2",
         )}
       >
         {project.name}

@@ -7,7 +7,8 @@ import type { CSSProperties } from "react"
  * with CSS. Seeding (not Math.random at render) keeps SSR + client markup
  * identical, so there's no hydration mismatch. Each shape floats in its own
  * direction; opacity is kept very low so focus stays on the page content.
- * Animation is disabled under `prefers-reduced-motion` (see globals.css).
+ * Under `prefers-reduced-motion` the drift slows rather than freezing (see
+ * globals.css), so the background still reads as alive on mobile low-power mode.
  */
 
 /** Deterministic PRNG (mulberry32) so shapes render identically on server + client. */

@@ -29,11 +29,8 @@ export function MetricCounter({ value }: { value: string }) {
       const el = ref.current
       if (!el) return
 
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        el.textContent = value
-        return
-      }
-
+      // Counting is a value change, not spatial movement, so it runs even under
+      // reduced motion (where vestibular animations are dropped elsewhere).
       const counter = { n: 0 }
       el.textContent = format(0)
       gsap.to(counter, {
