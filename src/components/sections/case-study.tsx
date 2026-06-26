@@ -95,6 +95,8 @@ function Media({
   className?: string
   priority?: boolean
 }) {
+  // Only render local `/public` paths — never an unvalidated stored value.
+  const safeSrc = src && /^\/[\w\-./]*$/.test(src) ? src : undefined
   return (
     <div
       className={cn(
@@ -102,9 +104,9 @@ function Media({
         className,
       )}
     >
-      {src ? (
+      {safeSrc ? (
         <Image
-          src={src}
+          src={safeSrc}
           alt={alt ?? ""}
           fill
           priority={priority}
