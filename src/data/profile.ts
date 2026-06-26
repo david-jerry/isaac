@@ -17,6 +17,8 @@ export const profile: Profile = {
     "I turn complex ideas into clean, intuitive digital experiences that look good, feel right, and actually drive real business growth.",
   location: "Remote · Worldwide",
   email: "isaaceffiongdavid@gmail.com",
+  // TODO: replace with Isaac's real WhatsApp number (international format).
+  whatsapp: "+2348000000000",
   available: true,
   since: "2019",
   current: {

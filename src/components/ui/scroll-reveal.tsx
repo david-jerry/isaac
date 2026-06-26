@@ -51,10 +51,15 @@ export function ScrollReveal({
     () => {
       const root = scope.current
       if (!root) return
-      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return
 
       const targets = root.querySelectorAll<HTMLElement>(selector)
       if (!targets.length) return
+
+      // Respect reduced motion by dropping the vertical travel (subtle opacity
+      // fade only) rather than disabling the reveal entirely — so content still
+      // animates in on devices that report reduce (incl. mobile low-power mode).
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      const dy = reduce ? 0 : y
 
       if (toggle) {
         // Each item plays in on enter and reverses out on leave (both ways), so
@@ -62,7 +67,7 @@ export function ScrollReveal({
         targets.forEach((el) => {
           gsap.fromTo(
             el,
-            { opacity: 0, y },
+            { opacity: 0, y: dy },
             {
               opacity: 1,
               y: 0,
@@ -82,7 +87,7 @@ export function ScrollReveal({
 
       gsap.from(targets, {
         opacity: 0,
-        y,
+        y: dy,
         duration: 0.65,
         ease: "power2.out",
         stagger,

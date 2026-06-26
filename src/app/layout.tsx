@@ -6,9 +6,11 @@ import { ThemeProvider } from "@/components/providers/theme-provider";
 import { Navbar } from "@/components/layout/navbar";
 import { Footer } from "@/components/layout/footer";
 import { FloatingShapes } from "@/components/layout/floating-shapes";
+import { GameLauncher } from "@/components/layout/game-launcher";
 import { PageTransition } from "@/components/layout/page-transition";
 import { ScrollProgress } from "@/components/layout/scroll-progress";
 import { Toaster } from "@/components/ui/sonner";
+import { siteDescription, siteName, siteUrl } from "@/lib/site";
 import "./globals.css";
 
 // Sans: the design calls for the commercial "Helvetica Now Display". Until the
@@ -34,9 +36,36 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Isaac — UI/UX Designer",
-  description:
-    "Portfolio of Isaac, a UI/UX designer crafting clear, human-centered product experiences.",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "Isaac David — UI/UX Designer",
+    template: "%s — Isaac David",
+  },
+  description: siteDescription,
+  applicationName: siteName,
+  authors: [{ name: siteName }],
+  creator: siteName,
+  keywords: [
+    "UI/UX Designer",
+    "Product Designer",
+    "Design Systems",
+    "Portfolio",
+    "Isaac David",
+  ],
+  alternates: { canonical: "/" },
+  robots: { index: true, follow: true },
+  openGraph: {
+    type: "website",
+    url: siteUrl,
+    siteName,
+    title: "Isaac — UI/UX Designer",
+    description: siteDescription,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Isaac — UI/UX Designer",
+    description: siteDescription,
+  },
 };
 
 export default function RootLayout({
@@ -59,11 +88,18 @@ export default function RootLayout({
         >
           <FloatingShapes />
           <QueryProvider>
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-md focus:bg-background focus:px-4 focus:py-2 focus:text-foreground focus:ring-2 focus:ring-brand"
+            >
+              Skip to content
+            </a>
             <Navbar />
-            <main className="flex-1 pt-16">
+            <main id="main-content" className="flex-1 pt-16">
               <PageTransition>{children}</PageTransition>
             </main>
             <Footer />
+            <GameLauncher />
             <ScrollProgress />
             <Toaster />
           </QueryProvider>

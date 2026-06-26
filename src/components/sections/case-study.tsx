@@ -163,7 +163,10 @@ export function CaseStudyView({ project }: { project: CaseStudy }) {
             priority
             className="h-full rounded-none"
           />
-          <div className="pointer-events-none absolute inset-x-0 bottom-6 overflow-hidden">
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-x-0 bottom-6 overflow-hidden"
+          >
             <div className="flex w-max animate-marquee whitespace-nowrap will-change-transform">
               {[0, 1].map((k) => (
                 <span
@@ -211,22 +214,22 @@ export function CaseStudyView({ project }: { project: CaseStudy }) {
               {project.meta ? (
                 <dl className="mt-8 space-y-1.5 text-sm">
                   {project.meta.role ? (
-                    <p>
-                      <span className="text-muted-foreground">Role</span> —{" "}
-                      {project.meta.role}
-                    </p>
+                    <div className="flex gap-2">
+                      <dt className="text-muted-foreground">Role —</dt>
+                      <dd>{project.meta.role}</dd>
+                    </div>
                   ) : null}
                   {project.meta.team ? (
-                    <p>
-                      <span className="text-muted-foreground">Team</span> —{" "}
-                      {project.meta.team}
-                    </p>
+                    <div className="flex gap-2">
+                      <dt className="text-muted-foreground">Team —</dt>
+                      <dd>{project.meta.team}</dd>
+                    </div>
                   ) : null}
                   {project.meta.impact?.length ? (
-                    <p>
-                      <span className="text-muted-foreground">Impact</span> —{" "}
-                      {project.meta.impact.join(" · ")}
-                    </p>
+                    <div className="flex gap-2">
+                      <dt className="text-muted-foreground">Impact —</dt>
+                      <dd>{project.meta.impact.join(" · ")}</dd>
+                    </div>
                   ) : null}
                 </dl>
               ) : null}
@@ -465,7 +468,7 @@ export function CaseStudyView({ project }: { project: CaseStudy }) {
                 data-reveal
                 href={project.closing.url}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="mt-6 inline-flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-brand"
               >
                 {project.closing.linkLabel ?? "Visit site"}

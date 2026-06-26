@@ -50,9 +50,20 @@ export function Footer() {
           </div>
         </div>
 
-        <p className="mt-16 text-xs text-muted-foreground">
-          Copyright © 2026 {profile.name}. All rights reserved.
-        </p>
+        <div className="mt-16 flex flex-col gap-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between">
+          <p>Copyright © 2026 {profile.name}. All rights reserved.</p>
+          <p>
+            Developed by{" "}
+            <a
+              href="https://jeremiahdavid.online"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-foreground transition-colors hover:text-brand"
+            >
+              Jargo
+            </a>
+          </p>
+        </div>
       </div>
     </footer>
   )

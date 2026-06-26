@@ -14,7 +14,8 @@ import * as THREE from "three"
  *
  * Dynamically imported with `ssr: false` so Three.js stays out of the SSR/initial
  * bundle. The loop pauses when the hero scrolls offscreen and everything is
- * disposed on unmount. Honors `prefers-reduced-motion` (one static frame).
+ * disposed on unmount. On touch devices (no hover `pointermove`) the wave point
+ * roams on its own; a finger drag takes over when it happens.
  */
 const BRAND_FALLBACK = "#e0613c"
 const SPACING = 24 // px between dots
@@ -135,8 +136,6 @@ export default function HeroBackground() {
     const container = containerRef.current
     if (!container) return
 
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-
     let renderer: THREE.WebGLRenderer
     try {
       renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true })
@@ -190,7 +189,12 @@ export default function HeroBackground() {
 
     const pointer = new THREE.Vector2(0, 0)
     const smoothed = new THREE.Vector2(0, 0)
+    // Touch devices don't emit hover `pointermove`, so the wave would have no
+    // input. Until a real pointer moves, drive the target along a slow path so
+    // the field keeps waving on its own (and finger drags still take over).
+    let hasPointer = false
     const onPointerMove = (e: PointerEvent) => {
+      hasPointer = true
       const rect = container.getBoundingClientRect()
       pointer.set(
         ((e.clientX - rect.left) / rect.width) * 2 - 1,
@@ -204,7 +208,11 @@ export default function HeroBackground() {
     let running = false
 
     const renderFrame = () => {
-      uniforms.uTime.value = clock.getElapsedTime()
+      const t = clock.getElapsedTime()
+      uniforms.uTime.value = t
+      if (!hasPointer) {
+        pointer.set(Math.sin(t * 0.3) * 0.6, Math.cos(t * 0.23) * 0.5)
+      }
       smoothed.lerp(pointer, 0.06)
       uniforms.uMouse.value.copy(smoothed)
       renderer.render(scene, camera)
@@ -212,7 +220,7 @@ export default function HeroBackground() {
     }
 
     const start = () => {
-      if (running || reduce) return
+      if (running) return
       running = true
       raf = requestAnimationFrame(renderFrame)
     }
@@ -227,7 +235,7 @@ export default function HeroBackground() {
     )
     io.observe(container)
 
-    // Always paint one frame (covers reduced-motion + initial state).
+    // Paint one frame immediately so there's no blank flash before the loop.
     renderer.render(scene, camera)
 
     return () => {

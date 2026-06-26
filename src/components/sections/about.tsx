@@ -1,62 +1,8 @@
 import Image from "next/image"
 
+import { aboutParagraphs, brands, experience } from "@/data/about"
 import { SectionMarker } from "@/components/layout/section-marker"
 import { ScrollReveal } from "@/components/ui/scroll-reveal"
-
-// About-page copy (from the design). Swap for `profile` fields or a CMS later.
-const paragraphs = [
-  "Hello, I'm Isaac, a product designer based in Rivers, Nigeria. I turn complex ideas into clean, intuitive digital experiences across web and mobile, with a real love for the details that make things feel right.",
-  "When I'm not designing, I'm gaming, playing football, or singing my heart out at karaoke.",
-]
-
-const brands = [
-  "Hoski",
-  "Omacart",
-  "Global Diamond Montreal",
-  "Cyphershield",
-  "Dormeo",
-  "TSA",
-  "Meadowlands Group",
-  "Alev Jewelry",
-  "Les Dentistes",
-  "Spectrum Aesthetics",
-  "Club Exec Auto",
-  "M'chel",
-  "Pandascrow",
-  "Capsule",
-  "P&A Roofing",
-  "Easy Entry",
-  "Redeye",
-  "Diamond Traders",
-  "Duck book",
-  "Kinfolq",
-  "Acre Cycle",
-  "Octopus",
-  "PeekUp",
-  "Spectrum Aesthetics",
-  "Acadly",
-]
-
-const experience = [
-  {
-    period: "2024 - Present",
-    roles: [
-      { company: "Cyphershield Inc.", role: "Lead Product Design" },
-      { company: "Hoski Inc.", role: "Lead UIUX Design" },
-    ],
-  },
-  {
-    period: "2021 - 2024",
-    roles: [
-      { company: "Pandascrow Technologies", role: "Lead Product Design" },
-      { company: "Bytestreams Technologie", role: "Freelance UIUX Designer" },
-    ],
-  },
-  {
-    period: "2019 - 2021",
-    roles: [{ company: "Circlepanda Inc.", role: "UIUX Designer" }],
-  },
-]
 
 export function About() {
   return (
@@ -83,7 +29,7 @@ export function About() {
       {/* Bio + team photo: side-by-side on desktop, stacked on mobile. */}
       <div className="mt-12 grid gap-8 md:grid-cols-2 md:items-center md:gap-12">
         <div className="space-y-6 text-base leading-relaxed text-muted-foreground sm:text-lg font-semibold">
-          {paragraphs.map((paragraph) => (
+          {aboutParagraphs.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
         </div>

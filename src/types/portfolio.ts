@@ -81,6 +81,8 @@ export interface Profile {
   intro: string
   location: string
   email: string
+  /** WhatsApp number in international format (e.g. "+2348012345678"). */
+  whatsapp: string
   available: boolean
   /** Year the designer started working — shown in the hero note. */
   since: string
