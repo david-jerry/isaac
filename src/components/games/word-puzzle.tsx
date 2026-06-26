@@ -65,9 +65,9 @@ export default function WordPuzzle() {
   const recorded = useRef(false)
 
   useEffect(() => {
-    const saved = localStorage.getItem("word_puzzle_best")
+    const saved = Number(localStorage.getItem("word_puzzle_best"))
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (saved) setBest(parseInt(saved, 10))
+    if (Number.isFinite(saved) && saved > 0) setBest(saved)
   }, [])
 
   // Countdown.

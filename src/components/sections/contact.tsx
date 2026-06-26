@@ -5,16 +5,10 @@ import { motion, useReducedMotion, type Variants } from "motion/react"
 import { Phone } from "lucide-react"
 
 import { profile } from "@/data/profile"
+import { contactReasons } from "@/data/contact"
 import { gsap, useGSAP } from "@/lib/gsap"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-
-const reasons = [
-  "Open to work!",
-  "Reach out about a project",
-  "To book a 1:1 portfolio review",
-  "Or just to say hello, bonjour, olá.",
-]
 
 export function Contact() {
   const reduce = useReducedMotion()
@@ -96,7 +90,7 @@ export function Contact() {
           variants={item}
           className="mt-8 space-y-1.5 text-muted-foreground sm:text-lg"
         >
-          {reasons.map((reason) => (
+          {contactReasons.map((reason) => (
             <li key={reason}>{reason}</li>
           ))}
         </motion.ul>
@@ -126,7 +120,7 @@ export function Contact() {
 
       <motion.div variants={item} className="flex justify-center">
         <Button asChild size="lg" variant="outline">
-          <a href={whatsappLink} target="_blank" rel="noreferrer">
+          <a href={whatsappLink} target="_blank" rel="noopener noreferrer">
             <Phone className="size-4" />
             Call on WhatsApp
           </a>

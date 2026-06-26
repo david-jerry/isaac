@@ -6,8 +6,9 @@ import { ProjectCard } from "@/components/sections/project-card"
 import { ScrollReveal } from "@/components/ui/scroll-reveal"
 
 export const metadata: Metadata = {
-  title: "Projects — Isaac David",
+  title: "Projects",
   description: "Selected case studies and product design work by Isaac David.",
+  alternates: { canonical: "/projects" },
 }
 
 export default function ProjectsPage() {

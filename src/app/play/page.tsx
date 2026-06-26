@@ -7,8 +7,9 @@ import { SectionMarker } from "@/components/layout/section-marker"
 import { ScrollReveal } from "@/components/ui/scroll-reveal"
 
 export const metadata: Metadata = {
-  title: "Play — Isaac David",
+  title: "Play",
   description: "Bored of reading? A couple of small games to play in the margins.",
+  alternates: { canonical: "/play" },
 }
 
 export default function PlayPage() {

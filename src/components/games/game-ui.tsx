@@ -22,7 +22,7 @@ const VARIANTS: Record<Variant, string> = {
   ghost: "bg-transparent hover:bg-muted",
 }
 const SIZES: Record<Size, string> = {
-  sm: "h-8 px-3 text-sm",
+  sm: "h-9 px-3.5 text-sm",
   default: "h-10 px-5 text-sm",
   lg: "h-11 px-6 text-sm",
   icon: "size-9",
@@ -37,7 +37,7 @@ export function GameButton({
   return (
     <button
       className={cx(
-        "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg font-medium whitespace-nowrap transition-colors outline-none select-none focus-visible:ring-2 focus-visible:ring-brand disabled:pointer-events-none disabled:opacity-50",
+        "inline-flex shrink-0 cursor-pointer items-center justify-center gap-2 rounded-lg font-medium whitespace-nowrap transition-colors outline-none select-none focus-visible:ring-2 focus-visible:ring-brand focus-visible:ring-offset-2 focus-visible:ring-offset-background disabled:pointer-events-none disabled:opacity-50",
         VARIANTS[variant],
         SIZES[size],
         className,

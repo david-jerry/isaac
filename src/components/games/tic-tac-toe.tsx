@@ -66,9 +66,21 @@ export default function TicTacToe() {
 
   useEffect(() => {
     // Hydrate persisted scores after mount (client-only) to avoid an SSR mismatch.
-    const saved = localStorage.getItem("tic_tac_toe_scores")
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (saved) setScores(JSON.parse(saved))
+    try {
+      const saved = localStorage.getItem("tic_tac_toe_scores")
+      if (!saved) return
+      const parsed = JSON.parse(saved)
+      if (parsed && typeof parsed === "object") {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setScores({
+          win: Number(parsed.win) || 0,
+          loss: Number(parsed.loss) || 0,
+          draw: Number(parsed.draw) || 0,
+        })
+      }
+    } catch {
+      /* ignore corrupt storage */
+    }
   }, [])
 
   // Record the outcome once per finished game.
@@ -135,14 +147,21 @@ export default function TicTacToe() {
           <p className="text-xs uppercase tracking-widest text-muted-foreground">
             You are <span className="text-brand">X</span>
           </p>
-          <p className="mt-1 text-lg font-medium">{status}</p>
+          <p
+            className="mt-1 text-lg font-medium"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >
+            {status}
+          </p>
         </div>
         <GameButton onClick={reset} variant="outline" size="sm">
           <RotateCcw className="size-3.5" /> Reset
         </GameButton>
       </div>
 
-      <div className="grid grid-cols-3 gap-2">
+      <div role="group" aria-label="Tic-Tac-Toe board" className="grid grid-cols-3 gap-2">
         {board.map((cell, i) => {
           const inWin = result?.line.includes(i)
           const interactive = !cell && !over && turn === "X"

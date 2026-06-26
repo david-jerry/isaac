@@ -20,10 +20,19 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params
   const project = getCaseStudy(slug)
-  if (!project) return {}
+  if (!project) return { robots: { index: false } }
   return {
-    title: `${project.name} — Isaac David`,
+    title: project.name,
     description: project.summary,
+    alternates: { canonical: `/projects/${slug}` },
+    openGraph: {
+      type: "article",
+      title: project.name,
+      description: project.summary,
+      images: project.heroImage
+        ? [{ url: project.heroImage, alt: project.imageAlt ?? project.name }]
+        : undefined,
+    },
   }
 }
 

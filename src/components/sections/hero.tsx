@@ -132,7 +132,7 @@ export function Hero() {
           <a
             href={profile.current.href}
             target="_blank"
-            rel="noreferrer"
+            rel="noopener noreferrer"
             className="inline-flex items-center gap-0.5 text-foreground underline-offset-4 transition-colors hover:text-brand hover:underline"
           >
             {profile.current.company}

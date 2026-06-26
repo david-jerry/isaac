@@ -223,4 +223,14 @@
   .floating-shape {
     animation-duration: 60s;
   }
+  .email-attention {
+    animation: none;
+  }
+  .animate-caret {
+    animation: none;
+    opacity: 1;
+  }
+  .animate-marquee {
+    animation-play-state: paused;
+  }
 }

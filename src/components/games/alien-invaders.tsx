@@ -44,6 +44,18 @@ function resolveBrand(): string {
   }
 }
 
+/** Safely read the persisted leaderboard (tolerates missing/corrupt values). */
+function readLeaderboard(): number[] {
+  try {
+    const raw = localStorage.getItem("alien_invaders_leaderboard")
+    const parsed: unknown = raw ? JSON.parse(raw) : []
+    if (!Array.isArray(parsed)) return []
+    return parsed.filter((n): n is number => typeof n === "number")
+  } catch {
+    return []
+  }
+}
+
 interface Entity {
   x: number
   y: number
@@ -117,11 +129,14 @@ export default function AlienInvaders() {
     stateRef.current.brand = resolveBrand()
 
     // Hydrate persisted values after mount (client-only) to avoid SSR mismatch.
-    const savedHighScore = localStorage.getItem("alien_invaders_highscore")
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (savedHighScore) setHighScore(parseInt(savedHighScore, 10))
-    const savedLeaderboard = localStorage.getItem("alien_invaders_leaderboard")
-    if (savedLeaderboard) setLeaderboard(JSON.parse(savedLeaderboard))
+    const savedHighScore = Number(
+      localStorage.getItem("alien_invaders_highscore"),
+    )
+    if (Number.isFinite(savedHighScore) && savedHighScore > 0) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setHighScore(savedHighScore)
+    }
+    setLeaderboard(readLeaderboard())
 
     const stars = []
     for (let i = 0; i < 100; i++) {
@@ -168,8 +183,7 @@ export default function AlienInvaders() {
   }, [gameState])
 
   const handleLeaderboardSave = (finalScore: number) => {
-    const saved = localStorage.getItem("alien_invaders_leaderboard")
-    let currentScores: number[] = saved ? JSON.parse(saved) : []
+    let currentScores = readLeaderboard()
     currentScores.push(finalScore)
     currentScores.sort((a, b) => b - a)
     currentScores = currentScores.slice(0, 5)
@@ -444,8 +458,15 @@ export default function AlienInvaders() {
         return true
       })
 
+      // Collect hits first, then remove — never splice mid-iteration (it skips
+      // elements and produces missed/double hits).
+      const deadLasers = new Set<number>()
+      const deadAliens = new Set<number>()
       stateRef.current.lasers.forEach((laser, lIdx) => {
-        stateRef.current.aliens.forEach((alien, aIdx) => {
+        if (deadLasers.has(lIdx)) return
+        for (let aIdx = 0; aIdx < stateRef.current.aliens.length; aIdx++) {
+          if (deadAliens.has(aIdx)) continue
+          const alien = stateRef.current.aliens[aIdx]
           const matchedHit =
             laser.x > alien.x - alien.width / 2 &&
             laser.x < alien.x + alien.width / 2 &&
@@ -453,10 +474,10 @@ export default function AlienInvaders() {
             laser.y < alien.y + alien.height / 2
           if (matchedHit) {
             alien.hp -= 1
-            stateRef.current.lasers.splice(lIdx, 1)
+            deadLasers.add(lIdx)
             if (alien.hp <= 0) {
               createExplosion(alien.x, alien.y, alien.color)
-              stateRef.current.aliens.splice(aIdx, 1)
+              deadAliens.add(aIdx)
               if (Math.random() < 0.15) {
                 const types: ("TRIPLE_SHOT" | "SHIELD")[] = [
                   "TRIPLE_SHOT",
@@ -491,9 +512,18 @@ export default function AlienInvaders() {
                 stateRef.current.level = currentCalcLevel
               }
             }
+            break // this laser is spent
           }
-        })
+        }
       })
+      if (deadLasers.size)
+        stateRef.current.lasers = stateRef.current.lasers.filter(
+          (_, i) => !deadLasers.has(i),
+        )
+      if (deadAliens.size)
+        stateRef.current.aliens = stateRef.current.aliens.filter(
+          (_, i) => !deadAliens.has(i),
+        )
 
       stateRef.current.particles = stateRef.current.particles.filter((pt) => {
         pt.x += pt.vx
@@ -523,6 +553,16 @@ export default function AlienInvaders() {
     <div className="mx-auto flex w-full max-w-6xl select-none flex-col items-stretch justify-center gap-6 rounded-2xl border border-border bg-card p-6 shadow-2xl lg:flex-row">
       {/* Game panel */}
       <div className="flex flex-1 flex-col items-center justify-center">
+        {/* Screen-reader status — game state announced politely. */}
+        <p className="sr-only" role="status" aria-live="polite" aria-atomic="true">
+          {gameState === "GAMEOVER"
+            ? `Game over. Final score ${score}.`
+            : gameState === "VICTORY"
+              ? `You won. Final score ${score}.`
+              : gameState === "PLAYING"
+                ? `Playing. Level ${level} of 5. ${lives} lives remaining.`
+                : "Press start to play Alien Invaders."}
+        </p>
         {/* HUD */}
         <div className="mb-4 flex w-full flex-wrap items-center justify-between gap-4 px-1">
           <div className="flex items-center gap-6">
@@ -575,10 +615,12 @@ export default function AlienInvaders() {
               </span>
             </div>
             <div className="flex items-center gap-1 rounded-lg border border-border bg-muted px-3 py-1.5">
-              <Shield className="mr-1 size-4 text-brand" />
+              <Shield className="mr-1 size-4 text-brand" aria-hidden="true" />
+              <span className="sr-only">{lives} of 3 lives remaining</span>
               {[...Array(3)].map((_, i) => (
                 <div
                   key={i}
+                  aria-hidden="true"
                   className={`h-5 w-3 rounded-sm transition-all duration-300 ${
                     i < lives ? "bg-brand" : "bg-border"
                   }`}
@@ -607,9 +649,9 @@ export default function AlienInvaders() {
               <div className="mb-4 flex size-14 items-center justify-center rounded-2xl border border-brand/20 bg-brand/10 text-brand">
                 <Sparkles className="size-7" />
               </div>
-              <h1 className="bg-gradient-to-b from-foreground to-foreground/50 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
+              <h2 className="bg-gradient-to-b from-foreground to-foreground/50 bg-clip-text text-3xl font-bold tracking-tight text-transparent">
                 Alien Invaders
-              </h1>
+              </h2>
               <p className="mt-2 max-w-sm text-xs text-muted-foreground">
                 Move to aim, your cannon fires automatically. Shoot the drones
                 before they reach you and clear five waves.
