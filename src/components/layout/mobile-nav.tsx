@@ -7,7 +7,7 @@ import { motion, useReducedMotion } from "motion/react"
 import { ArrowUpRight } from "lucide-react"
 
 import { cn } from "@/lib/utils"
-import { gsap, useGSAP } from "@/lib/gsap"
+import { gsap } from "@/lib/gsap"
 import { navLinks } from "@/data/nav"
 import { profile } from "@/data/profile"
 import { useActiveNav } from "@/hooks/use-active-nav"
@@ -31,59 +31,62 @@ export function MobileNav() {
   )
 
   const overlayRef = useRef<HTMLDivElement>(null)
-  const tl = useRef<gsap.core.Timeline | null>(null)
 
-  // Build the open/close timeline once the overlay exists. Scoped to the overlay
-  // so `.nav-line` / `.nav-meta` resolve inside the portaled node. `.from()`
-  // immediate-renders the hidden start state (links sit collapsed while closed).
-  useGSAP(
-    () => {
-      if (!overlayRef.current) return
-      const d = reduce ? 0 : 1
-      gsap.set(overlayRef.current, { clipPath: CLOSED_CLIP })
+  // Animate the overlay open/closed whenever `open` changes (and re-run once the
+  // portal mounts or the motion preference changes). A fresh timeline per toggle
+  // — driven imperatively with explicit `fromTo`s — avoids the first-tap desync
+  // the persistent paused-timeline + play/reverse approach suffered from (the
+  // timeline got reverted by portal-mount / reduced-motion re-renders).
+  useEffect(() => {
+    const el = overlayRef.current
+    if (!el) return
+    const d = reduce ? 0 : 1
+    const lines = el.querySelectorAll<HTMLElement>(".nav-line")
+    const meta = el.querySelectorAll<HTMLElement>(".nav-meta")
 
-      tl.current = gsap
-        .timeline({ paused: true })
-        .to(overlayRef.current, {
-          clipPath: OPEN_CLIP,
-          duration: 0.6 * d,
-          ease: "power4.inOut",
-        })
-        .from(
-          ".nav-line",
+    const tl = gsap.timeline()
+    if (open) {
+      tl.to(el, {
+        clipPath: OPEN_CLIP,
+        duration: 0.6 * d,
+        ease: "power4.inOut",
+      })
+        .fromTo(
+          lines,
+          { yPercent: 120, opacity: 0 },
           {
-            yPercent: 120,
-            opacity: 0,
+            yPercent: 0,
+            opacity: 1,
             duration: 0.6 * d,
             stagger: reduce ? 0 : 0.08,
             ease: "power3.out",
           },
           "-=0.3",
         )
-        .from(
-          ".nav-meta",
+        .fromTo(
+          meta,
+          { y: 24, opacity: 0 },
           {
-            y: 24,
-            opacity: 0,
+            y: 0,
+            opacity: 1,
             duration: 0.5 * d,
             stagger: reduce ? 0 : 0.06,
             ease: "power2.out",
           },
           "-=0.35",
         )
-    },
-    { scope: overlayRef, dependencies: [mounted, reduce] },
-  )
+    } else {
+      tl.to(el, {
+        clipPath: CLOSED_CLIP,
+        duration: 0.5 * d,
+        ease: "power4.inOut",
+      })
+    }
 
-  // Drive the timeline from open state.
-  useGSAP(
-    () => {
-      if (!tl.current) return
-      if (open) tl.current.play()
-      else tl.current.reverse()
-    },
-    { dependencies: [open] },
-  )
+    return () => {
+      tl.kill()
+    }
+  }, [open, mounted, reduce])
 
   // Lock body scroll + close on Escape while open.
   useEffect(() => {
